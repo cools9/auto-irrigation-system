@@ -1,0 +1,34 @@
+const int MOISTURE_SENSOR_PIN = A0;
+const int RELAY_PIN = 4;
+const int MOISTURE_THRESHOLD = 500;
+const int PUMP_DURATION = 3000;
+const int CHECK_INTERVAL = 1800000;
+
+unsigned long lastWateringTime = 0;
+
+void setup() {
+  pinMode(RELAY_PIN, OUTPUT);
+  digitalWrite(RELAY_PIN, LOW);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int moistureLevel = analogRead(MOISTURE_SENSOR_PIN);
+  Serial.print("Moisture Level: ");
+  Serial.println(moistureLevel);
+  if (moistureLevel > MOISTURE_THRESHOLD && 
+      (millis() - lastWateringTime) >= CHECK_INTERVAL) {
+    waterPlant();
+    lastWateringTime = millis();
+  }
+
+  delay(1000);
+}
+
+void waterPlant() {
+  Serial.println("Soil is dry - Starting pump");
+  digitalWrite(RELAY_PIN, HIGH);
+  delay(PUMP_DURATION);
+  digitalWrite(RELAY_PIN, LOW);
+  Serial.println("Watering complete");
+}
